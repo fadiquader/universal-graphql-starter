@@ -9,11 +9,23 @@
 
 import Sequelize from 'sequelize';
 import config from '../config';
-
-const sequelize = new Sequelize(config.databaseUrl, {
-  define: {
-    freezeTableName: true,
+//
+// const sequelize = new Sequelize(config.databaseUrl, {
+//   define: {
+//     freezeTableName: true,
+//   },
+// });
+const sequelize = new Sequelize(
+  'test_graphql_db1',
+  'test_graphql_admin1',
+  'iamapassword1',
+  {
+    host: 'localhost',
+    dialect: 'postgres',
+    define: {
+      freezeTableName: true,
+    },
   },
-});
+);
 
 export default sequelize;

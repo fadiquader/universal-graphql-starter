@@ -10,32 +10,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import s from './Page.css';
+import s from './Admin.css';
 
-class Page extends React.Component {
+class AdminSub extends React.Component {
   static propTypes = {
-    title: PropTypes.string,
-    html: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
   };
-  static defaultProps = {
-    title: '',
-  };
+
   render() {
-    const { title, html } = this.props;
     return (
       <div className={s.root}>
         <div className={s.container}>
           <h1>
-            {title}
+            {this.props.title}
           </h1>
-          <div
-            // eslint-disable-next-line react/no-danger
-            dangerouslySetInnerHTML={{ __html: html }}
-          />
+          <div>admin sub</div>
         </div>
       </div>
     );
   }
 }
 
-export default withStyles(s)(Page);
+export default withStyles(s)(AdminSub);

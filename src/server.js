@@ -1,18 +1,13 @@
-/**
- * React Starter Kit (https://www.reactstarterkit.com/)
- *
- * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE.txt file in the root directory of this source tree.
- */
-
 import path from 'path';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import expressJwt, { UnauthorizedError as Jwt401Error } from 'express-jwt';
-import expressGraphQL from 'express-graphql';
+// import expressGraphQL from 'express-graphql';
+import { graphiqlExpress, graphqlExpress } from 'graphql-server-express';
+import { makeExecutableSchema } from 'graphql-tools';
+import { execute, subscribe } from 'graphql';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
 import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
 import React from 'react';
@@ -26,13 +21,19 @@ import createFetch from './createFetch';
 import passport from './passport';
 import router from './router';
 import models from './data/models';
-import schema from './data/schema';
+import typeDefs from './data/schema';
+import resolvers from './data/reolvers';
 import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 import config from './config';
+import configureStore from './store/configureStore';
+
+const schema = makeExecutableSchema({
+  typeDefs,
+  resolvers,
+});
 
 const app = express();
 
-//
 // Tell any CSS tooling (such as Material UI) to use all vendor prefixes if the
 // user agent is not known.
 // -----------------------------------------------------------------------------
@@ -97,26 +98,43 @@ app.get(
 //
 // Register API middleware
 // -----------------------------------------------------------------------------
+// app.use(
+//   '/graphql',
+//   expressGraphQL(req => ({
+//     schema,
+//     graphiql: __DEV__,
+//     rootValue: { request: req },
+//     pretty: __DEV__,
+//   })),
+// );
+app.use(
+  '/graphiql',
+  graphiqlExpress({
+    endpointURL: '/graphql',
+    // subscriptionsEndpoint: '/subscriptions',
+  }),
+);
 app.use(
   '/graphql',
-  expressGraphQL(req => ({
+  graphqlExpress(req => ({
     schema,
-    graphiql: __DEV__,
-    rootValue: { request: req },
-    pretty: __DEV__,
+    context: {
+      models,
+      user: req.user || null,
+    },
   })),
 );
-
 //
 // Register server-side rendering middleware
 // -----------------------------------------------------------------------------
 app.get('*', async (req, res, next) => {
   try {
     const css = new Set();
-
+    const store = configureStore({});
     // Global (context) variables that can be easily accessed from any React component
     // https://facebook.github.io/react/docs/context.html
     const context = {
+      store,
       // Enables critical path CSS rendering
       // https://github.com/kriasoft/isomorphic-style-loader
       insertCss: (...styles) => {
@@ -132,7 +150,7 @@ app.get('*', async (req, res, next) => {
 
     const route = await router.resolve({
       ...context,
-      path: req.path,
+      pathname: req.path,
       query: req.query,
     });
 
@@ -149,6 +167,7 @@ app.get('*', async (req, res, next) => {
     );
     data.styles = [{ id: 'css', cssText: [...css].join('') }];
     data.scripts = [assets.vendor.js];
+    data.state = JSON.stringify(store.getState());
     if (route.chunks) {
       data.scripts.push(...route.chunks.map(chunk => assets[chunk].js));
     }

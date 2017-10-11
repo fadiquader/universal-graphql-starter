@@ -1,18 +1,20 @@
-/**
- * React Starter Kit (https://www.reactstarterkit.com/)
- *
- * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE.txt file in the root directory of this source tree.
- */
+import React from 'react';
+import Layout from '../components/Layout';
+import AdminSub from './admin-sub';
 
 /* eslint-disable global-require */
 
+// async action({ next }) {
+//   const component = await next();
+// const Lay = await import(/* webpackChunkName: 'home' */ '../components/Layout');
+
+// console.log('component ', component, Lay)
+// return component && <Layout>{component}</Layout>
+// },
+
 // The top-level (parent) route
 const routes = {
-  path: '/',
-
+  path: '',
   // Keep in mind, routes are evaluated in order
   children: [
     {
@@ -41,12 +43,23 @@ const routes = {
     },
     {
       path: '/admin',
-      load: () => import(/* webpackChunkName: 'admin' */ './admin'),
-    },
 
+      children: [
+        {
+          path: '',
+          load: () => import(/* webpackChunkName: 'admin' */ './admin'),
+        },
+        {
+          path: '/:admin',
+          load: () => import(/* webpackChunkName: 'privacy' */ './privacy'),
+
+          // load: () => import(/* webpackChunkName: 'admin' */ './admin-sub'),
+        },
+      ],
+    },
     // Wildcard routes, e.g. { path: '*', ... } (must go last)
     {
-      path: '*',
+      path: '(.*)',
       load: () => import(/* webpackChunkName: 'not-found' */ './not-found'),
     },
   ],
@@ -56,7 +69,7 @@ const routes = {
     const route = await next();
 
     // Provide default values for title, description etc.
-    route.title = `${route.title || 'Untitled Page'} - www.reactstarterkit.com`;
+    route.title = `${route.title || 'Untitled Page'}`;
     route.description = route.description || '';
 
     return route;

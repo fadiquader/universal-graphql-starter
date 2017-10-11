@@ -13,6 +13,8 @@ import UserLogin from './UserLogin';
 import UserClaim from './UserClaim';
 import UserProfile from './UserProfile';
 
+// ---------------------- Relations ----------------------------;
+// user Relations
 User.hasMany(UserLogin, {
   foreignKey: 'userId',
   as: 'logins',

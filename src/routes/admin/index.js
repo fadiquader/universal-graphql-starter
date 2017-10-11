@@ -12,19 +12,20 @@ import Layout from '../../components/Layout';
 import Admin from './Admin';
 
 const title = 'Admin Page';
-const isAdmin = false;
+const isAdmin = true;
 
-function action() {
+async function action(ctx) {
   if (!isAdmin) {
     return { redirect: '/login' };
   }
-
   return {
     chunks: ['admin'],
     title,
     component: (
       <Layout>
-        <Admin title={title} />
+        <Admin title={title}>
+          <div />
+        </Admin>
       </Layout>
     ),
   };

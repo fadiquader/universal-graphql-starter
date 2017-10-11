@@ -12,7 +12,7 @@ import Layout from '../../components/Layout';
 import Page from '../../components/Page';
 import privacy from './privacy.md';
 
-function action() {
+function action(ctx) {
   return {
     chunks: ['privacy'],
     title: privacy.title,

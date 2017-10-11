@@ -14,9 +14,12 @@ import s from './Admin.css';
 
 class Admin extends React.Component {
   static propTypes = {
-    title: PropTypes.string.isRequired,
+    title: PropTypes.string,
+    // children: PropTypes.
   };
-
+  static defaultProps = {
+    title: '',
+  };
   render() {
     return (
       <div className={s.root}>
@@ -25,6 +28,7 @@ class Admin extends React.Component {
             {this.props.title}
           </h1>
           <p>...</p>
+          {this.props.children}
         </div>
       </div>
     );
