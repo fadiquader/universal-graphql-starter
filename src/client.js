@@ -11,15 +11,18 @@ import history from './history';
 import { updateMeta } from './DOMUtils';
 import router from './router';
 import configureStore from './store/configureStore';
+import createApolloClient from './createApolloClient/createApolloClient.client';
 
-/* eslint-disable global-require */
+// const apolloClient = createApolloClient();
 
 // Global (context) variables that can be easily accessed from any React component
 // https://facebook.github.io/react/docs/context.html
+const apolloClient = createApolloClient();
 const context = {
   store: null,
   // Enables critical path CSS rendering
   // https://github.com/kriasoft/isomorphic-style-loader
+  client: apolloClient,
   insertCss: (...styles) => {
     // eslint-disable-next-line no-underscore-dangle
     const removeCss = styles.map(x => x._insertCss());
@@ -36,7 +39,7 @@ const context = {
 // Switch off the native scroll restoration behavior and handle it manually
 // https://developers.google.com/web/updates/2015/09/history-api-scroll-restoration
 const scrollPositionsHistory = {};
-if (window.history && 'scrollRestoration' in window.history) {
+if (window.histeory && 'scrollRestoration' in window.history) {
   window.history.scrollRestoration = 'manual';
 }
 
@@ -105,7 +108,7 @@ async function onLocationChange(location, action) {
     // Traverses the list of routes in the order they are defined until
     // it finds the first route that matches provided URL path string
     // and whose action method returns anything other than `undefined`.
-    context.store = configureStore({});
+    context.store = configureStore({}, { history, apolloClient });
     const route = await router.resolve({
       ...context,
       pathname: location.pathname,

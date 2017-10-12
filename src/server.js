@@ -13,6 +13,8 @@ import fetch from 'node-fetch';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
 import PrettyError from 'pretty-error';
+import { renderToStringWithData } from 'react-apollo';
+import createApolloClient from './createApolloClient/createApolloClient.server';
 import App from './components/App';
 import Html from './components/Html';
 import { ErrorPageWithoutStyle } from './routes/error/ErrorPage';
@@ -129,8 +131,20 @@ app.use(
 // -----------------------------------------------------------------------------
 app.get('*', async (req, res, next) => {
   try {
+    const apolloClient = createApolloClient({
+      schema,
+      rootValue: { request: req },
+    });
     const css = new Set();
-    const store = configureStore({});
+    const store = configureStore(
+      {
+        user: req.user || null,
+      },
+      {
+        cookie: req.headers.cookie,
+        apolloClient,
+      },
+    );
     // Global (context) variables that can be easily accessed from any React component
     // https://facebook.github.io/react/docs/context.html
     const context = {
@@ -160,7 +174,7 @@ app.get('*', async (req, res, next) => {
     }
 
     const data = { ...route };
-    data.children = ReactDOM.renderToString(
+    data.children = await renderToStringWithData(
       <App context={context}>
         {route.component}
       </App>,

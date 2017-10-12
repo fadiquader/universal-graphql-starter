@@ -5,6 +5,7 @@ const ContextType = {
   // Enables critical path CSS rendering
   // https://github.com/kriasoft/isomorphic-style-loader
   store: PropTypes.object.isRequired,
+  client: PropTypes.object.isRequired,
   insertCss: PropTypes.func.isRequired,
   // Universal HTTP client
   fetch: PropTypes.func.isRequired,

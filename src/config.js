@@ -18,7 +18,7 @@ if (process.env.BROWSER) {
 module.exports = {
   // Node.js app
   port: process.env.PORT || 3000,
-
+  host: process.env.WEBSITE_HOSTNAME || `localhost:${this.port}`,
   // API Gateway
   api: {
     // API URL to be used in the client-side code

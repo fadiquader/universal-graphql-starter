@@ -240,7 +240,11 @@ const config = {
           name: staticAssetName,
         },
       },
-
+      {
+        test: /\.(graphql|gql)$/,
+        exclude: /node_modules/,
+        loader: 'graphql-tag/loader',
+      },
       // Exclude dev modules from production build
       ...(isDebug
         ? []
